@@ -1,0 +1,45 @@
+### Java ###
+*.class
+*.log
+*.ctxt
+hs_err_pid*
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+### Spring Boot ###
+# Fichiers de config locaux (si tu crées application-local.yml)
+application-local.yml
+application-local.properties
+
+### IDEs ###
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+logs/
+*.tmp
+*.swp
+
+### Env files ###
+.env
+.env.*
