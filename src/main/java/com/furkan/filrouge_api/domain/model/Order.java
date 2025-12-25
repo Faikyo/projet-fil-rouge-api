@@ -1,12 +1,11 @@
 package com.furkan.filrouge_api.domain.model;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
-
 import com.furkan.filrouge_api.domain.exception.BusinessRuleException;
 import com.furkan.filrouge_api.domain.exception.InvalidStateTransitionException;
 import com.furkan.filrouge_api.domain.value.OrderStatus;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 public class Order {
 
@@ -18,41 +17,32 @@ public class Order {
 
     private final List<OrderItem> items;
 
-    public Order(UUID id, UUID customerId, OrderStatus status, List<OrderItem> items) {
-        this.id = id;
+    
+    public Order(UUID customerId) {
+        if (customerId == null) throw new BusinessRuleException("customerId is required");
+        this.id = UUID.randomUUID();
         this.customerId = customerId;
-        this.status = status;
-        this.items = items;
+        this.status = OrderStatus.CREATED;
+        this.items = new ArrayList<>();
     }
 
-    public UUID getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
+    public UUID getCustomerId() { return customerId; }
+    public OrderStatus getStatus() { return status; }
 
-    public UUID getCustomerId() {
-        return customerId;
-    }
-    public OrderStatus getStatus() {
-        return status;
-    }
-    public void setStatus(OrderStatus status) {
-        this.status = status;
-    }
     public List<OrderItem> getItems() {
-        return items;
+        return Collections.unmodifiableList(items);
     }
 
-    // Règle : Si PAID ou CANCELLED => plus de modification
     private void ensureModifiable() {
         if (status == OrderStatus.PAID || status == OrderStatus.CANCELLED) {
             throw new InvalidStateTransitionException("Order is not modifiable when status is " + status);
         }
     }
-    
+
     public void addItem(UUID serviceId, BigDecimal unitPrice, int quantity) {
         ensureModifiable();
         items.add(new OrderItem(UUID.randomUUID(), serviceId, unitPrice, quantity));
-
     }
 
     public void removeItem(UUID itemId) {
@@ -71,30 +61,29 @@ public class Order {
 
     public void validateOrder() {
         ensureModifiable();
+
         if (status != OrderStatus.CREATED) {
             throw new InvalidStateTransitionException("Can only validate an order in CREATED status");
         }
         if (items.isEmpty()) {
-            throw new IllegalStateException("Order must have at least one item to be validated.");
+            throw new BusinessRuleException("Order must have at least one item to be validated.");
         }
-        this.status = OrderStatus.VALIDATED;
+        status = OrderStatus.VALIDATED;
     }
 
     public void pay() {
-        if (status == OrderStatus.CANCELLED) {
-            throw new InvalidStateTransitionException("Cannot pay a CANCELLED order");
+        if (status != OrderStatus.VALIDATED) {
+            throw new InvalidStateTransitionException("Only VALIDATED orders can be paid.");
         }
-        if (this.status != OrderStatus.VALIDATED) {
-            throw new IllegalStateException("Only validated orders can be paid.");
-        }
-        this.status = OrderStatus.PAID;
+        status = OrderStatus.PAID;
     }
 
     public void cancel() {
-        if (this.status == OrderStatus.PAID) {
-            throw new IllegalStateException("Paid orders cannot be cancelled.");
+        if (status == OrderStatus.PAID) {
+            throw new InvalidStateTransitionException("Paid orders cannot be cancelled.");
         }
-        this.status = OrderStatus.CANCELLED;
+        if (status == OrderStatus.CANCELLED) return; // idempotent, optionnel
+        status = OrderStatus.CANCELLED;
     }
 
     @Override
