@@ -3,7 +3,7 @@ package com.furkan.filrouge_api.domain.model;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class ServiceCatalogueItem {
+public class ServiceCatalogItem {
 
     private final UUID id;
 
@@ -13,7 +13,7 @@ public class ServiceCatalogueItem {
 
     private boolean active;
 
-    public ServiceCatalogueItem(UUID id, String name, BigDecimal price, boolean active) {
+    public ServiceCatalogItem(UUID id, String name, BigDecimal price, boolean active) {
         if(id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
@@ -48,6 +48,14 @@ public class ServiceCatalogueItem {
     }
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public void activate() {
+        this.active = true;
     }
     @Override
     public String toString() {
