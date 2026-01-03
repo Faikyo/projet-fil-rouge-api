@@ -1,11 +1,16 @@
 package com.furkan.filrouge_api.config;
 
 import com.furkan.filrouge_api.repository.UserRepository;
+import com.furkan.filrouge_api.repository.memory.InMemoryInvoiceRepository;
+import com.furkan.filrouge_api.repository.memory.InMemoryOrderRepository;
+import com.furkan.filrouge_api.repository.memory.InMemoryServiceRepository;
 import com.furkan.filrouge_api.repository.memory.InMemoryUserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.furkan.filrouge_api.repository.ServiceRepository;
+import com.furkan.filrouge_api.repository.InvoiceRepository;
+import com.furkan.filrouge_api.repository.OrderRepository;
 
 @Configuration
 public class RepositoryConfig {
@@ -16,7 +21,17 @@ public class RepositoryConfig {
     }
     @Bean
     public ServiceRepository serviceRepository() {
-        return new com.furkan.filrouge_api.repository.memory.InMemoryServiceRepository();
+        return new InMemoryServiceRepository();
     }
+    @Bean
+    public OrderRepository orderRepository() {
+        return new InMemoryOrderRepository();
+    }
+
+    @Bean
+    public InvoiceRepository invoiceRepository() {
+        return new InMemoryInvoiceRepository();
+    }
+
 
 }
